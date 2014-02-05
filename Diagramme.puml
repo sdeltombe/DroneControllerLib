@@ -1,0 +1,62 @@
+@startuml
+
+Controller <|-- MyoController
+Controller <|-- KeyboardController
+Controller <|-- WiiMoteController
+Controller <|-- SmartPhoneController
+DCManager*--Controller
+DCManager*--ArDroneCommander
+DCManager*--ControllerFactory
+ISubscriber <|-- DCManager
+
+
+class DCManager{
+    -ArDroneCommander commander
+    -Controller controller
+    +void OnReceivedCommand(ArDroneCommand cmd)
+    +UseController(string type,string[] args)
+}
+
+class ControllerFactory{
+    +Controller CreateController(string type,string[] args)
+}
+class ArDroneCommand{
+    +altitude_max
+    +speed
+    +action
+}
+class ArDroneCommander{
+  -Ip
+  +void TakeOff()
+  +void Landing()
+  +void Rotate()
+  +void Command(ArDroneCommand cmd)
+}
+
+abstract Controller{
+    -ISubscriber subscriber
+    +void connect()
+    +void diconnect()
+    +void listen()
+    +void subscribe(ISubscriber subscriber)
+}
+
+interface ISubscriber{
+     +void onReceivedCommand(ArDroneCommand cmd);
+}
+
+class MyoController {
+   
+}
+
+class KeyboardController {
+  
+}
+class SmartPhoneController {
+
+}
+class WiiMoteController {
+
+}
+
+@enduml

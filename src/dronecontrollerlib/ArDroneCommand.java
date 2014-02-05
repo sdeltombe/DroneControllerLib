@@ -4,10 +4,15 @@
  * and open the template in the editor.
  */
 
+package dronecontrollerlib;
+
 /**
  *
  * @author Seb
  */
-public class Manager {
-    
+public class ArDroneCommand {
+    public String action;
+    public boolean shift;
+    public float speed;
+    public String at_cmd;
 }
