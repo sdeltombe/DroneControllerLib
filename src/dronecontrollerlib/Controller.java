@@ -17,9 +17,20 @@ public abstract class Controller {
     
     /* Protected member */
     protected ArDroneCommand cmd;
-    
+    protected Utility utility;
+    protected Object[] args;
     
     /*public member */
+    
+    
+    public Controller(Utility utility,Object[] args)
+    {
+        this.utility = utility;
+        this.args=args;
+        cmd = new ArDroneCommand();
+    }
+    
+    
     public abstract void connect();
     public abstract void listen();
     public abstract void disconnect();
@@ -31,6 +42,7 @@ public abstract class Controller {
     {
         this.subscriber.onReceivedCommand(cmd);
     }
+  
     
             
             

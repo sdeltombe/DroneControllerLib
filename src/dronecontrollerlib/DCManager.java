@@ -10,20 +10,32 @@ package dronecontrollerlib;
  */
 public class DCManager implements ISubscriber {
 
-    ArDroneCommander commander;
-    Controller controller;
-    public DCManager(String defaultControllerType, Object[] args)
-    {
-        commander = new ArDroneCommander();
-        controller = ControllerFactory.CreateController(defaultControllerType, args);
-        controller.subscribe(this);
-        controller.connect();
-    }
+    protected ArDroneCommander commander;
+    protected Controller controller;
+    protected Factory factory;
+    protected Utility utility;
+    private ArDroneCommand cmd;
     
+    public DCManager(Factory factory,String defaultControllerType, Object[] args)
+    {
+        this.factory = factory;
+        this.utility = factory.createUtility();
+        this.commander = ArDroneCommander.getInstance();
+        this.controller = factory.createController(defaultControllerType, args);
+        
+    }
+    public void run()
+    {
+       this.commander.init(factory.getUtility());
+       this.commander.start();
+       this.controller.subscribe(this);
+       this.controller.connect();
+    }
     
     @Override
     public void onReceivedCommand(ArDroneCommand cmd) {
-        commander.SendCommand(cmd);
+        this.cmd = cmd.clone();
+        commander.sendCommand(this.cmd);
     }
     
 }
