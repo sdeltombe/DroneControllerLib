@@ -7,6 +7,8 @@
 package dronecontrollerlib;
 
 
+import static dronecontrollerlib.ArDroneCommander.DELAY_IN_MS;
+import static dronecontrollerlib.NavData.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -80,7 +82,6 @@ public class ArDroneReceiver extends Thread {
         utility.threadSleep(DELAY_IN_MS);
         commander.SendStopBOOTSTRAP();
         utility.threadSleep(DELAY_IN_MS);
-        
     }
     private int get_int(byte[] data, int offset)
     {
@@ -91,6 +92,10 @@ public class ArDroneReceiver extends Thread {
             value += (data[offset + i] & 0x000000FF) << shift;
         }
         return value;
+    }
+     public int byteArrayToShort(byte[] b, int offset)
+    {
+        return ((b[offset + 1] & 0x000000FF) << 8) + (b[offset] & 0x000000FF);
     }
       
     
@@ -106,9 +111,10 @@ public class ArDroneReceiver extends Thread {
             try{
                 if(socket != null)
                 {
+                    SendInitMessage();
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                     socket.receive(packet);
-                    //utility.trace("NAVDATA received length :" + packet.getLength() + "\n");
+                    utility.trace("NAVDATA received length :" + packet.getLength() + "\n");
                     int header = get_int(packet.getData(),0);
                     if(header != 0x55667788)
                     {
@@ -117,8 +123,20 @@ public class ArDroneReceiver extends Thread {
                     {
                          //utility.trace("header ok");
                     }
-                    
-                    int state = get_int(packet.getData(),NAV_STATE_OFFSET);
+                    int offset = NAV_STATE_OFFSET;
+                    int state = get_int(packet.getData(),offset);
+                    offset+=4;
+                    /*int sequence = get_int(packet.getData(),offset);
+                    offset+=4;
+                    offset+=4;*/
+                    /*while(offset <packet.getData().length)
+                    {
+                        int option_tag = byteArrayToShort(packet.getData(), offset);
+                        offset += 2;
+                        int option_len = byteArrayToShort(packet.getData(), offset);
+                        offset += 2;
+                        utility.trace("option_tag" + option_tag + ": option_len" + option_len);
+                    }*/
                     //String message = new String(packet.getData(),0,packet.getLength());
                     //utility.trace("state:" + state);
                     navData.parseNavData(state);
@@ -126,9 +144,11 @@ public class ArDroneReceiver extends Thread {
                     {
                         utility.trace("" + navData);
                     }else{
-                        utility.trace("no change in navData...");
+                        //utility.trace("no change in navData...sequence:" + sequence);
                     }
-                    utility.threadSleep(2000);
+                    
+                    utility.threadSleep(DELAY_IN_MS);
+                    //utility.threadSleep(500);
                 }
             }
             catch(java.io.IOException ex)

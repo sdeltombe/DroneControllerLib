@@ -20,6 +20,7 @@ public class NavData {
     private final Map<String,Boolean> states = new HashMap<>();
     private Boolean update = false;
     public static final String FLYING = "flying";
+    public static final String PB_COM="communicationProblemOccurred";
     public NavData()
     {
         states.put(FLYING,false);
@@ -51,7 +52,7 @@ public class NavData {
         states.put("acquisitionThreadOn",false);
         states.put("controlWatchdogDelayed",false);
         states.put("ADCWatchdogDelayed",false);
-        states.put("communicationProblemOccurred",false);
+        states.put(PB_COM,false);
         states.put("emergency",false);
     }
     public Boolean IsUpdate()

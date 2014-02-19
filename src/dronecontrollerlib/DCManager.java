@@ -22,7 +22,7 @@ public class DCManager implements ISubscriber {
         this.utility = factory.createUtility();
         this.commander = ArDroneCommander.getInstance();
         this.controller = factory.createController(defaultControllerType, args);
-        
+        utility.trace(this.commander.getVersion());
     }
     public void run()
     {
