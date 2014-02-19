@@ -295,6 +295,8 @@ public class ArDroneCommander extends Thread {
             writer.write("RETR version.txt\r\n");
             response = reader.readLine();
             
+            socketTcp.close();
+            
             
         }catch (UnknownHostException ex)
         {
