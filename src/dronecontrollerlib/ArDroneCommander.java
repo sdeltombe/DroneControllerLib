@@ -118,7 +118,7 @@ public class ArDroneCommander extends Thread {
         int watchDogCounter = 0;
         while(send)
         {
-            if(/*navData.getState(NavData.FLYING)*/isFlying && !isLanding)
+            if(navData.getState(NavData.FLYING) && !isLanding)
             {
                 if(!isMoving)
                 {
@@ -192,7 +192,7 @@ public class ArDroneCommander extends Thread {
     {
         isMoving = false;
       
-        send_at_cmd("AT*PCMD=" + (seq++) + ",1,0,0,0,0");
+        send_at_cmd("AT*PCMD=" + (seq++) + ",0,0,0,0,0");
     }
     
     public void landing()
@@ -213,8 +213,6 @@ public class ArDroneCommander extends Thread {
         int i=0;
         isLanding = false;
         isMoving = false;
-        //SendResetWatchDog();
-        //sendFlatTrim();
         
         while(!navData.getState(NavData.FLYING))
         {
@@ -224,7 +222,6 @@ public class ArDroneCommander extends Thread {
             if(i>200)
             {
                utility.trace(" takeOff timeout");
-               isFlying = true;
                break;
             }
         }
@@ -235,9 +232,10 @@ public class ArDroneCommander extends Thread {
     public String getVersion()
     {
         String response = new String();
+         
         try{
+           
             Socket socketTcp = new Socket(DEFAULT_IP,FTP_PORT);
-            
             InputStream input = socketTcp.getInputStream();
             OutputStream ouput = socketTcp.getOutputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(input));
@@ -248,24 +246,30 @@ public class ArDroneCommander extends Thread {
             if(!response.startsWith("220 "))
             {
                 utility.trace( "unknown response when connecting to the FTP server: " + response);
+                 socketTcp.close();
+                return "Error during getVersion";
             }
             
             //Log en anonymous
             writer.write("USER anonymous\r\n");
             writer.flush();
             response = reader.readLine();
-            if(!response.startsWith("331 "))
+            if(!response.startsWith("230 "))
             {
                 utility.trace( "unknown response after sending the user: " + response);
+                 socketTcp.close();
+                return "Error during getVersion";
             }
                         
             //Set to PASV mode
-            writer.write("PASV");
-            input = socketTcp.getInputStream();                        
+            writer.write("PASV\r\n");
+            writer.flush();                       
             response = reader.readLine();
             if (!response.startsWith("227 ")) 
             {
                     utility.trace( "unknown response after sending passive mode: " + response);
+                     socketTcp.close();
+                    return "Error during getVersion";
             }
             
             int port = -1;
@@ -279,8 +283,9 @@ public class ArDroneCommander extends Thread {
                     tokenizer.nextToken();
                     tokenizer.nextToken();
                     tokenizer.nextToken();
-                    port = Integer.parseInt(tokenizer.nextToken()) * 256
-                    + Integer.parseInt(tokenizer.nextToken());
+                    int a = Integer.parseInt(tokenizer.nextToken());
+                    int b = Integer.parseInt(tokenizer.nextToken());
+                    port = a * 256 + b;
               } catch (NumberFormatException e) {
                 utility.traceError("getVerion()", e);
               }
@@ -293,6 +298,7 @@ public class ArDroneCommander extends Thread {
             writer = new BufferedWriter(new OutputStreamWriter(ouput));
             
             writer.write("RETR version.txt\r\n");
+            writer.flush();
             response = reader.readLine();
             
             socketTcp.close();

@@ -64,7 +64,7 @@ public class ArDroneReceiver extends Thread {
         byte[] bufInit = {0x01,0x00,0x00,0x00};
         DatagramPacket packetInit = new DatagramPacket(bufInit, bufInit.length);/*, inet_addr, NAVDATA_PORT);*/
         try{
-            utility.trace("=>SendInitMessage to NAVDATA_PORT");
+            //utility.trace("=>SendInitMessage to NAVDATA_PORT");
             socket.send(packetInit);
         }catch (java.io.IOException ex)
         {
@@ -114,7 +114,7 @@ public class ArDroneReceiver extends Thread {
                     SendInitMessage();
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                     socket.receive(packet);
-                    utility.trace("NAVDATA received length :" + packet.getLength() + "\n");
+                    //utility.trace("NAVDATA received length :" + packet.getLength() + "\n");
                     int header = get_int(packet.getData(),0);
                     if(header != 0x55667788)
                     {
