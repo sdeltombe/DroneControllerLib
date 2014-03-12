@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package dronecontrollerlib;
+package dronecontrollerlib.pkg;
 
 
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import java.util.Map.Entry;
  */
 public class NavData {
    
-    private final Map<String,Boolean> states = new HashMap<>();
+    private final Map<String,Boolean> states = new HashMap<String,Boolean>();
     private Boolean update = false;
     public static final String FLYING = "flying";
     public static final String PB_COM="communicationProblemOccurred";

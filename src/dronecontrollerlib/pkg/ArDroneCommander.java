@@ -4,7 +4,8 @@
  * and open the template in the editor.
  */
 
-package dronecontrollerlib;
+package dronecontrollerlib.pkg;
+/* use for getVersion in progress...
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,14 +13,14 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
+import java.io.PrintStream;*/
 import java.net.*;
 import java.util.*;
 /**
  *
  * @author Seb
  */
-public class ArDroneCommander extends Thread {
+public class ArDroneCommander /*implements Runnable*/extends Thread {
     InetAddress inet_addr;
     DatagramSocket socket;
     int seq = 1; //Send AT command with sequence number 1 will reset the counter
@@ -35,7 +36,7 @@ public class ArDroneCommander extends Thread {
     private Boolean send = true;
     private Boolean isLanding=false;
     private Boolean isMoving=false;
-    private Boolean isFlying = false;
+ 
     NavData navData = new NavData();
     
     /** Holder */
@@ -56,6 +57,7 @@ public class ArDroneCommander extends Thread {
     {
         
     }
+   
     
     public void init(Utility utility)
     {
@@ -92,10 +94,9 @@ public class ArDroneCommander extends Thread {
         }        
     }
     
-     //@Override
-    public void start()
+    
+    public void init()
     {
-        
         //undocumented command
         send_at_cmd("AT*PMODE=" + (seq++) + ",2");
         send_at_cmd("AT*MISC=" + (seq++) + ",2,20,2000,3000");
@@ -110,11 +111,11 @@ public class ArDroneCommander extends Thread {
         receiver = new ArDroneReceiver(navData,inet_addr,utility);
         //on lance le thread du receiver
         receiver.start();
-        super.start();
     }
     
-    // @Override
+    @Override
     public void run() {
+        init();
         int watchDogCounter = 0;
         while(send)
         {
@@ -127,7 +128,7 @@ public class ArDroneCommander extends Thread {
                 }else{
                     send_at_cmd("AT*PCMD=" + (seq++) + ",1," + 
                             cmd.getLeftRightTilt() + "," + //tourner à gauche/tourner à droite
-                            cmd.getFrontBackTilt() + "," + //avant/arriere à droite
+                            cmd.getFrontBackTilt() + "," + //avant/arriere
                             cmd.getVerticalSpeed() + "," + //haut/bas
                             cmd.getAngularSpeed()); //rotation gauche/droite
                     
@@ -160,12 +161,16 @@ public class ArDroneCommander extends Thread {
     	utility.trace("AT command: " + at_cmd);    	
 	byte[] buffer = (at_cmd + "\r").getBytes();
 	DatagramPacket packet = new DatagramPacket(buffer, buffer.length, inet_addr, DEFAULT_PORT);
-	try{
+	
+        try{
             socket.send(packet);
             utility.threadSleep(DELAY_IN_MS);
         }catch (java.io.IOException ex)
         {
-            System.out.println(ex.getMessage());
+            utility.traceError("IOException during send_at_cmd:", ex);
+        }catch(Exception ex)
+        {
+            utility.traceError("Exception during send_at_cmd:", ex);
         }
       	
     }
@@ -213,10 +218,10 @@ public class ArDroneCommander extends Thread {
         int i=0;
         isLanding = false;
         isMoving = false;
+        utility.trace("TakeOff !! ds ArDroneCommander");
         
         while(!navData.getState(NavData.FLYING))
         {
-            
             send_at_cmd("AT*REF=" + (seq++) + ",290718208");
             i++;
             if(i>200)
@@ -228,7 +233,7 @@ public class ArDroneCommander extends Thread {
         
         
     }
-     
+     /* EN TRAVAUX pas nécessaire
     public String getVersion()
     {
         String response = new String();
@@ -291,11 +296,14 @@ public class ArDroneCommander extends Thread {
               }
             }
             socketTcp.close();
+            
             socketTcp = new Socket(DEFAULT_IP,port);
+           
             input = socketTcp.getInputStream();
             ouput = socketTcp.getOutputStream();
             reader = new BufferedReader(new InputStreamReader(input));
             writer = new BufferedWriter(new OutputStreamWriter(ouput));
+           
             
             writer.write("RETR version.txt\r\n");
             writer.flush();
@@ -314,7 +322,7 @@ public class ArDroneCommander extends Thread {
         }
         return "Version du Firmware :" + response;
     }
-    
+    */
    
     
     

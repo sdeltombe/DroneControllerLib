@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package dronecontrollerlib;
+package dronecontrollerlib.pkg;
 /**
  *
  * @author Seb
@@ -27,16 +27,26 @@ public class DCManager implements ISubscriber {
     public void run()
     {
        this.commander.init(factory.getUtility());
-       //utility.trace(this.commander.getVersion());
        this.commander.start();
+       
        this.controller.subscribe(this);
        this.controller.connect();
+       this.controller.listen();
     }
     
     @Override
     public void onReceivedCommand(ArDroneCommand cmd) {
+        // Instanciation et lancement du traitement
         this.cmd = cmd.clone();
-        commander.sendCommand(this.cmd);
+        final ArDroneCommand command = this.cmd;
+        Thread t = new Thread() {    
+        @Override
+        public void run() {
+           commander.sendCommand(command);
+        }
+      };
+      t.start();
+       
     }
     
 }

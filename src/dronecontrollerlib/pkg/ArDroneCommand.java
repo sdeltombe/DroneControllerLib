@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package dronecontrollerlib;
+package dronecontrollerlib.pkg;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -19,12 +19,13 @@ import java.nio.IntBuffer;
 
 public class ArDroneCommand implements Cloneable {
     public DroneAction action;
-    private float leftRightTilt;
-    private float frontBackTilt;
-    private float verticalSpeed;
-    private float angularSpeed;
+    private float leftRightTilt;//tourner à gauche/tourner à droite
+    private float frontBackTilt;//avant/arriere 
+    private float verticalSpeed;//haut/bas
+    private float angularSpeed;//rotation gauche/droite
     private static FloatBuffer fb;
     private static IntBuffer ib;
+    
     
     public ArDroneCommand()
     {
@@ -46,7 +47,7 @@ public class ArDroneCommand implements Cloneable {
     {
         return intOfFloat(verticalSpeed);
     }
-      public int getAngularSpeed()
+    public int getAngularSpeed()
     {
         return intOfFloat(angularSpeed);
     }
@@ -55,44 +56,34 @@ public class ArDroneCommand implements Cloneable {
     
     public void setLeftRightTilt(float leftRightTilt)
     {
-        if(controlValue(leftRightTilt))
-        {
-            this.leftRightTilt = leftRightTilt;
-        }else{
-            //TODO throw Exception
-        }
+        this.leftRightTilt = controlValue(leftRightTilt);
     }
-     public void setFrontBackTilt(float frontBackTilt)
+    public void setFrontBackTilt(float frontBackTilt)
     {
-        if(controlValue(frontBackTilt))
-        {
-            this.frontBackTilt = frontBackTilt;
-        }else{
-            //TODO throw Exception
-        }
+        this.frontBackTilt = controlValue(frontBackTilt);
     }
-      public void setVerticalSpeed(float verticalSpeed)
+    public void setVerticalSpeed(float verticalSpeed) 
     {
-        if(controlValue(verticalSpeed))
-        {
-            this.verticalSpeed = verticalSpeed;
-        }else{
-            //TODO throw Exception
-        }
+        this.verticalSpeed = controlValue(verticalSpeed);
     }
-       public void setAngularSpeed(float angularSpeed)
+    public void setAngularSpeed(float angularSpeed)
     {
-        if(controlValue(angularSpeed))
-        {
-            this.angularSpeed = angularSpeed;
-        }else{
-            //TODO throw Exception
-        }
+        this.angularSpeed = controlValue(angularSpeed);
     }
     
-    private boolean controlValue(float value)
+    private float controlValue(float value)
     {
-        return (value >= -1 && value <= 1);
+        if(value > 1)
+        {
+            return 1;
+        }
+        else if(value < -1)
+        {
+            return -1;
+        }
+        else{
+            return value;
+        }
     }
     
     
@@ -117,5 +108,17 @@ public class ArDroneCommand implements Cloneable {
     public static float floatOfInt(int i) {
         ib.put(0, i);
         return fb.get(0);
+    }
+    
+    @Override
+    public String toString()
+    {
+        String chaine="action:" + action + "\n";
+        chaine+="leftRightTilt:" + leftRightTilt + "\n";
+        chaine+="frontBackTilt:" + frontBackTilt + "\n";
+        chaine+="verticalSpeed:" + verticalSpeed + "\n";
+        chaine+="angularSpeed:" + angularSpeed + "\n";
+  
+        return chaine;
     }
 }

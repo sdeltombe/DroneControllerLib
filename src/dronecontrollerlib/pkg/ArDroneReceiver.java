@@ -4,11 +4,11 @@
  * and open the template in the editor.
  */
 
-package dronecontrollerlib;
+package dronecontrollerlib.pkg;
 
 
-import static dronecontrollerlib.ArDroneCommander.DELAY_IN_MS;
-import static dronecontrollerlib.NavData.*;
+import static dronecontrollerlib.pkg.ArDroneCommander.DELAY_IN_MS;
+import static dronecontrollerlib.pkg.NavData.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -40,13 +40,17 @@ public class ArDroneReceiver extends Thread {
         this.commander = ArDroneCommander.getInstance();
         this.navData = navData;
         try{
-            this.socket = new DatagramSocket();/*NAVDATA_PORT,inet_addr);*/
+            this.socket = new DatagramSocket();
             socket.connect(inet_addr, NAVDATA_PORT);
             //configuration du timeout de reception
             this.socket.setSoTimeout(3000);
         }catch(SocketException ex)
         {
-            utility.traceError("ArDroneReceiver error during socket creation:", ex);
+            utility.traceError("ArDroneReceiver SocketException:", ex);
+        }
+        catch(Exception ex)
+        {
+            utility.traceError("ArDroneReceiver Exception:", ex);
         }
         
     }
@@ -69,7 +73,11 @@ public class ArDroneReceiver extends Thread {
         }catch (java.io.IOException ex)
         {
             System.out.println(ex.getMessage());
-        }	
+        }
+         catch(Exception ex)
+        {
+            utility.traceError("ArDroneReceiver SendInitMessage Exception:", ex);
+        }
     }
     
    
@@ -77,11 +85,16 @@ public class ArDroneReceiver extends Thread {
     
     public void connect()
     {
-        SendInitMessage();
-       
-        utility.threadSleep(DELAY_IN_MS);
-        commander.SendStopBOOTSTRAP();
-        utility.threadSleep(DELAY_IN_MS);
+         try{
+            SendInitMessage();
+
+            utility.threadSleep(DELAY_IN_MS);
+            commander.SendStopBOOTSTRAP();
+            utility.threadSleep(DELAY_IN_MS);
+         }catch(Exception ex)
+            {
+                utility.traceError("ArDroneReceiver connect Exception:", ex);
+            }
     }
     private int get_int(byte[] data, int offset)
     {
@@ -114,6 +127,7 @@ public class ArDroneReceiver extends Thread {
                     SendInitMessage();
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                     socket.receive(packet);
+                    
                     //utility.trace("NAVDATA received length :" + packet.getLength() + "\n");
                     int header = get_int(packet.getData(),0);
                     if(header != 0x55667788)
@@ -126,19 +140,7 @@ public class ArDroneReceiver extends Thread {
                     int offset = NAV_STATE_OFFSET;
                     int state = get_int(packet.getData(),offset);
                     offset+=4;
-                    /*int sequence = get_int(packet.getData(),offset);
-                    offset+=4;
-                    offset+=4;*/
-                    /*while(offset <packet.getData().length)
-                    {
-                        int option_tag = byteArrayToShort(packet.getData(), offset);
-                        offset += 2;
-                        int option_len = byteArrayToShort(packet.getData(), offset);
-                        offset += 2;
-                        utility.trace("option_tag" + option_tag + ": option_len" + option_len);
-                    }*/
-                    //String message = new String(packet.getData(),0,packet.getLength());
-                    //utility.trace("state:" + state);
+                  
                     navData.parseNavData(state);
                     if(navData.IsUpdate())
                     {
@@ -148,16 +150,20 @@ public class ArDroneReceiver extends Thread {
                     }
                     
                     utility.threadSleep(DELAY_IN_MS);
-                    //utility.threadSleep(500);
                 }
             }
             catch(java.io.IOException ex)
             {
-                if(ex.getMessage().contains("Receive timed out"))
+                if(ex.getMessage()!=null && ex.getMessage().contains("Receive timed out"))
                 {
                     connect();
                 }
                 utility.traceError("IOException during receive message", ex);
+            }
+            catch(Exception ex)
+            {
+                 utility.traceError("Exception during receive message", ex);
+            
             }
             
         }

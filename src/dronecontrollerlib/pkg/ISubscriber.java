@@ -4,15 +4,12 @@
  * and open the template in the editor.
  */
 
-package dronecontrollerlib;
+package dronecontrollerlib.pkg;
 
 /**
  *
  * @author Seb
  */
-public interface Utility {
-    public void trace(String trace);
-    public void traceError(String trace,Exception ex);
-    public void threadSleep(int milliseconds);
-   
+public interface ISubscriber {
+        void onReceivedCommand(ArDroneCommand cmd);
 }

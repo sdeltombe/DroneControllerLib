@@ -4,12 +4,18 @@
  * and open the template in the editor.
  */
 
-package dronecontrollerlib;
+package dronecontrollerlib.pkg;
 
 /**
  *
  * @author Seb
  */
-public interface ISubscriber {
-        void onReceivedCommand(ArDroneCommand cmd);
+
+public enum DroneAction
+{
+    TAKE_OFF,
+    LANDING,
+    HOVERING,
+    MOVING
 }
+
