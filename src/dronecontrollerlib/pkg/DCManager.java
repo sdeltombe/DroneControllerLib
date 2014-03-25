@@ -26,8 +26,8 @@ public class DCManager implements ISubscriber {
     }
     public void run()
     {
-       this.commander.init(factory.getUtility());
-       this.commander.start();
+       //this.commander.init(factory.getUtility());
+       //this.commander.start();
        
        this.controller.subscribe(this);
        this.controller.connect();

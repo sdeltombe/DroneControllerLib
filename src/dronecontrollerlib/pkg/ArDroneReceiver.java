@@ -62,7 +62,7 @@ public class ArDroneReceiver extends Thread {
     }
     
     
-    public void SendInitMessage()
+    public void sendInitMessage()
     {
         //indicate to the drone to respond just to us
         byte[] bufInit = {0x01,0x00,0x00,0x00};
@@ -86,7 +86,7 @@ public class ArDroneReceiver extends Thread {
     public void connect()
     {
          try{
-            SendInitMessage();
+            sendInitMessage();
 
             utility.threadSleep(DELAY_IN_MS);
             commander.SendStopBOOTSTRAP();
@@ -124,7 +124,7 @@ public class ArDroneReceiver extends Thread {
             try{
                 if(socket != null)
                 {
-                    SendInitMessage();
+                    sendInitMessage();
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                     socket.receive(packet);
                     
