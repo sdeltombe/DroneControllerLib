@@ -25,6 +25,8 @@ public class SocketController extends Controller implements Runnable  {
     private ServerSocket socket;
     static final int DELAY_IN_MS = 100;
     private boolean listen = true;
+    WiimoteData wiimoteData = new WiimoteData();
+    ExecutionCommandeController exeProg = new ExecutionCommandeController(this);
     Socket client;
     public SocketController(Utility utility, Object[] args) {
         super(utility,args);
@@ -109,7 +111,9 @@ public class SocketController extends Controller implements Runnable  {
                     String response = new BufferedReader(new InputStreamReader(input)).readLine();
                     if(response!=null)
                     {
-                        utility.trace("Received message requestId:" + response);        
+                        utility.trace("Received message requestId:" + response);
+                        sortCommand (response);
+                        exeProg.onReceivedEvent(wiimoteData);
                     }
                 }
                 catch(SocketTimeoutException ex)
@@ -129,11 +133,68 @@ public class SocketController extends Controller implements Runnable  {
     }
     private void sortCommand(String command)
     {
-        if(command.startsWith("BT:A"))//BT appuyer
+        String button;
+        button = command.substring(1, command.length());
+        if(command.startsWith("p"))//Bouton pressé
         {
-            //TODO takeoff
+            setCommand (button, (char)1);
+        }
+        else if (command.startsWith("r"))//Bouton relaché
+        {
+            setCommand (button, (char)0);
+        }
+        else if (command.startsWith("y") || command.startsWith("x"))
+        {
+            if (command.startsWith("y"))
+            {
+                wiimoteData.angleRoll = Float.parseFloat(button);
+            }
+            else if (command.startsWith("x"))
+            {
+                wiimoteData.anglePitch = Float.parseFloat(button);
+            }
         }
         
+    }
+    
+    private void setCommand (String button, char a)
+    {
+        if (button.equals("A"))
+        {
+            wiimoteData.etatBoutonA = a;
+        }
+        else if (button.equals("B"))
+        {
+            wiimoteData.etatBoutonB = a;
+        }
+        else if (button.equals("UP"))
+        {
+            wiimoteData.etatBoutonHaut = a;
+        } 
+        else if (button.equals("DOWN"))
+        {
+            wiimoteData.etatBoutonBas = a;
+        }
+        else if (button.equals("LEFT"))
+        {
+            wiimoteData.etatBoutonGauche = a;
+        }
+        else if (button.equals("RIGHT"))
+        {
+            wiimoteData.etatBoutonDroit = a;
+        }
+        else if (button.equals("PLUS"))
+        {
+            wiimoteData.etatBoutonPos = a;
+        }
+        else if (button.equals("MINUS"))
+        {
+            wiimoteData.etatBoutonNeg = a;
+        }
+        else if (button.equals("HOME"))
+        {
+            wiimoteData.etatBoutonHome = a;
+        }
     }
     
 }

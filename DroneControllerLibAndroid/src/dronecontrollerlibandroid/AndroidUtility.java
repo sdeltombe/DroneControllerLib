@@ -4,31 +4,30 @@
  * and open the template in the editor.
  */
 
-package dronecontrollerlib.pkg;
-
+package dronecontrollerlibandroid;
+import dronecontrollerlib.*;
 /**
  *
  * @author Seb
  */
-public class MyoController extends Controller {
-
-    public MyoController(Utility utility,Object[] args) {
-        super(utility,args);
-    }
+public class AndroidUtility implements Utility {
 
     @Override
-    public void connect() {
+    public void trace(String trace) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void listen() {
+    public void traceError(String trace, Exception ex) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void disconnect() {
+    public void threadSleep(int milliseconds) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+   
     
+     
 }
