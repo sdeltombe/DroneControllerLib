@@ -56,7 +56,7 @@ public class WiimoteCommander {
             modeNormal (wiimoteData);
         }
         etatAncienBoutonHomeAccelero = wiimoteData.etatBoutonHome; 
-        //notifySubscriber();
+        controller.notifySubscriber();
 
     }
     
