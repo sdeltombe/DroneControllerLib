@@ -1,60 +1,80 @@
 @startuml
 
 package dronecontrollerlib #DDDDDD{
-DCManager *-- Controller
-DCManager *-- ArDroneCommander
-DCManager *-- Factory
-DCManager o-- Utility
+    DCManager *-- Controller
+    DCManager *-- ArDroneCommander
+    DCManager o-- Factory
+    DCManager o-- Utility
+    ArDroneCommander *-- ArDroneReceiver
+    ArDroneCommander *-- ArDroneCommand
+    ArDroneCommander *-- ArDroneCommander
+    ArDroneReceiver *-- NavData
+    ArDroneCommander o-- NavData
+    ISubscriber <|-- DCManager
+    Controller <|-- MyoController
+    Controller o-- ISubscriber
+    Controller o-- ArDroneCommand
+    
+    class NavData{
+        -Map<String,Boolean> states
+        +Boolean getState(String stateType)
+        +void SetState(String stateType, Boolean value)
+        +Boolean IsUpdate()
+        +void parseNavData(int state)
+    }
 
-ISubscriber <|-- DCManager
-Controller <|-- MyoController
-Controller <|-- WiiMoteController
-Controller o-- ISubscriber
-Controller o-- ArDroneCommand
+    class DCManager{
+        +DCManager(Factory factory,String defaultControllerType, Object[] args)
+        +run()
+    }
 
-class DCManager{
-    +void OnReceivedCommand(ArDroneCommand cmd)
-    +UseController(string type,string[] args)
-}
+    abstract Factory{
+        +Controller CreateController(string type,string[] args)
+        +{abstract} Utility CreateUtility();
+    }
+    abstract Utility{
+        + void trace(String trace);
+        + void traceError(String trace,Exception ex);
+    }
+    class ArDroneCommand{
+        +leftRightTilt
+        +frontBackTilt
+        +verticalSpeed
+        +angularSpeed
+        +DroneAction action
+        +ArDroneCommand clone()
+    }
+    class ArDroneCommander{
+      -socket
+      +static ArDroneCommander getInstance()
+      +void init(Utility utility)
+      +void command(ArDroneCommand cmd)
+      +void takeOff()
+      +void landing()
+      +void run();
+    }
+    class ArDroneReceiver{
+      -socket
+      +void sendInitMessage()
+      +void connect()
+      +void run();
+    }
 
-abstract Factory{
-    +Controller CreateController(string type,string[] args)
-    +{abstract} Utility CreateUtility();
-}
-abstract Utility{
-    + void trace(String trace);
-    + void traceError(String trace,Exception ex);
-}
-class ArDroneCommand{
-    +altitude_max
-    +speed
-    +action
-}
-class ArDroneCommander{
-  -Ip
-  +void takeOff()
-  +void landing()
-  +void rotate()
-  +void command(ArDroneCommand cmd)
-}
+    abstract Controller{
+        -ISubscriber subscriber
+        +void connect()
+        +void diconnect()
+        +void listen()
+        +void subscribe(ISubscriber subscriber)
+    }
 
-abstract Controller{
-    -ISubscriber subscriber
-    +void connect()
-    +void diconnect()
-    +void listen()
-    +void subscribe(ISubscriber subscriber)
-}
+    interface ISubscriber{
+         +void onReceivedCommand(ArDroneCommand cmd);
+    }
+  
+    class MyoController {
 
-interface ISubscriber{
-     +void onReceivedCommand(ArDroneCommand cmd);
-}
-class WiiMoteController {
-
-}
-class MyoController {
-   
-}
+    }
 }
 
 package dronecontrollerlibstd{
