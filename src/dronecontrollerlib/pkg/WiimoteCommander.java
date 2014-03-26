@@ -15,7 +15,8 @@ public class WiimoteCommander {
 
     Controller controller;
     boolean etatModeAccelero = false;
-    char etatAncienBoutonHomeAccelero = 0;
+    boolean etatAncienBoutonHomeAccelero = false;
+    float ancienneValeurX;
     
     public WiimoteCommander (Controller controller)
     {
@@ -24,17 +25,17 @@ public class WiimoteCommander {
     
     public void onReceivedEvent (WiimoteData wiimoteData)
     {
-        if (wiimoteData.etatBouton1 == 1)
+        if (wiimoteData.etatBouton1 == true)
         {
             controller.utility.trace ("==TAKE OFF==");
             controller.cmd.action=TAKE_OFF;
         }
-        else if (wiimoteData.etatBouton2 == 1)
+        else if (wiimoteData.etatBouton2 == true)
         {
             controller.utility.trace ("==LANDING==");
             controller.cmd.action=LANDING;
         }
-        else if (wiimoteData.etatBoutonHome != etatAncienBoutonHomeAccelero && wiimoteData.etatBoutonHome == 1)
+        else if (wiimoteData.etatBoutonHome != etatAncienBoutonHomeAccelero && wiimoteData.etatBoutonHome == true)
         {
             if (etatModeAccelero == true)
             {
@@ -56,42 +57,44 @@ public class WiimoteCommander {
             modeNormal (wiimoteData);
         }
         etatAncienBoutonHomeAccelero = wiimoteData.etatBoutonHome; 
-        controller.notifySubscriber();
+        //controller.notifySubscriber();
 
     }
     
     
     ///////////////////// MODE ACELERO ///////////////////////////////
     private void modeAccelero (WiimoteData wiimoteData) {
-        if (wiimoteData.etatBoutonA == 1)
+        if (wiimoteData.etatBoutonA == true)
         {
             configureCommand ("==AVANCE==",(float) 0,(float) 0, (float) -0.5, (float) 0);
         }
-        else if (wiimoteData.etatBoutonB == 1)
+        else if (wiimoteData.etatBoutonB == true)
         {
             configureCommand ("==RECULE==",(float) 0,(float) 0, (float) 0.5, (float) 0);
         }
-        else if (wiimoteData.etatBoutonDroit == 1)
+        else if (wiimoteData.etatBoutonDroit == true)
         {
             configureCommand ("==DROITE==",(float) 0,(float) 0.5, (float) 0, (float) 0);
         }
-        else if (wiimoteData.etatBoutonGauche == 1)
+        else if (wiimoteData.etatBoutonGauche == true)
         {
             configureCommand ("==GAUCHE==",(float) 0,(float) -0.5, (float) 0, (float) 0);
         }
-        else if (wiimoteData.anglePitch >= (float)0.2 || wiimoteData.anglePitch <= (float)-0.1)
+        else if ((wiimoteData.anglePitch >= (float)0.2 || wiimoteData.anglePitch <= (float)-0.1) 
+                && wiimoteData.anglePitch != ancienneValeurX)
         {
-            configureCommand ("==DEPLACEMENT AV/AR==",(float) 0,(float) 0, wiimoteData.angleRoll, (float) 0);
+            configureCommand ("==DEPLACEMENT AV/AR==",(float) 0,(float) 0, wiimoteData.anglePitch, (float) 0);
+           // ancienneValeurX = 
         }
         else if (wiimoteData.angleRoll >= (float)0.2 || wiimoteData.angleRoll <= (float)-0.1)
         {
             configureCommand ("==DEPLACEMENT G/D==",(float) 0,wiimoteData.angleRoll, (float) 0, (float) 0);
         }
-        else if (wiimoteData.etatBoutonPos == 1)
+        else if (wiimoteData.etatBoutonPos == true)
         {
             configureCommand ("==MONTE==",(float) 0.5,(float) 0, (float) 0, (float) 0);
         }
-        else if (wiimoteData.etatBoutonNeg == 1)
+        else if (wiimoteData.etatBoutonNeg == true)
         {
             configureCommand ("==DESCEND==",(float) -0.5,(float) 0, (float) 0, (float) 0);
         }
@@ -104,27 +107,27 @@ public class WiimoteCommander {
     
     ////////////////////////// MODE NORMAL ///////////////////////////////
     private void modeNormal (WiimoteData wiimoteData) {
-        if (wiimoteData.etatBoutonA == 1)
+        if (wiimoteData.etatBoutonA == true)
         {
             configureCommand ("==AVANCE==",(float) 0,(float) 0, (float) -0.5, (float) 0);
         }
-        else if (wiimoteData.etatBoutonB == 1)
+        else if (wiimoteData.etatBoutonB == true)
         {
             configureCommand ("==RECULE==",(float) 0,(float) 0, (float) 0.5, (float) 0);
         }
-        else if (wiimoteData.etatBoutonDroit == 1)
+        else if (wiimoteData.etatBoutonDroit == true)
         {
             configureCommand ("==DROITE==",(float) 0,(float) 0.5, (float) 0, (float) 0);
         }
-        else if (wiimoteData.etatBoutonGauche == 1)
+        else if (wiimoteData.etatBoutonGauche == true)
         {
             configureCommand ("==GAUCHE==",(float) 0,(float) -0.5, (float) 0, (float) 0);
         }
-        else if (wiimoteData.etatBoutonPos == 1)
+        else if (wiimoteData.etatBoutonPos == true)
         {
             configureCommand ("==MONTE==",(float) 0.5,(float) 0, (float) 0, (float) 0);
         }
-        else if (wiimoteData.etatBoutonNeg == 1)
+        else if (wiimoteData.etatBoutonNeg == true)
         {
             configureCommand ("==DESCEND==",(float) -0.5,(float) 0, (float) 0, (float) 0);
         }

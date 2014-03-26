@@ -25,6 +25,7 @@ public class SocketController extends Controller implements Runnable  {
     private ServerSocket socket;
     static final int DELAY_IN_MS = 100;
     private boolean listen = true;
+    float ancienneValeurY, ancienneValeurX;
     WiimoteData wiimoteData = new WiimoteData();
     WiimoteCommander exeProg = new WiimoteCommander(this);
     Socket client;
@@ -111,7 +112,7 @@ public class SocketController extends Controller implements Runnable  {
                     String response = new BufferedReader(new InputStreamReader(input)).readLine();
                     if(response!=null)
                     {
-                        utility.trace("Received message requestId:" + response);
+                        //utility.trace("Received message requestId:" + response);
                         sortCommand (response);
                         exeProg.onReceivedEvent(wiimoteData);
                     }
@@ -131,33 +132,38 @@ public class SocketController extends Controller implements Runnable  {
                 
         }
     }
+    @SuppressWarnings("empty-statement")
     private void sortCommand(String command)
     {
         String button;
         button = command.substring(1, command.length());
         if(command.startsWith("p"))//Bouton pressé
         {
-            setCommand (button, (char)1);
+            setCommand (button, true);
         }
         else if (command.startsWith("r"))//Bouton relaché
         {
-            setCommand (button, (char)0);
+            setCommand (button, false);
         }
-        else if (command.startsWith("y") || command.startsWith("x"))
+        else if ((command.startsWith("y") && Float.parseFloat(command.substring(1, command.length())) != ancienneValeurY)
+                    || command.startsWith("x") && Float.parseFloat(command.substring(1, command.length())) != ancienneValeurX);
         {
             if (command.startsWith("y"))
             {
                 wiimoteData.angleRoll = Float.parseFloat(button);
+                ancienneValeurY = Float.parseFloat(command.substring(1, command.length()));
             }
             else if (command.startsWith("x"))
             {
                 wiimoteData.anglePitch = Float.parseFloat(button);
+                ancienneValeurX = Float.parseFloat(command.substring(1, command.length()));
             }
         }
         
+        
     }
     
-    private void setCommand (String button, char a)
+    private void setCommand (String button, boolean a)
     {
         if (button.equals("A"))
         {
@@ -166,6 +172,14 @@ public class SocketController extends Controller implements Runnable  {
         else if (button.equals("B"))
         {
             wiimoteData.etatBoutonB = a;
+        }
+        else if (button.equals("ONE"))
+        {
+            wiimoteData.etatBouton1 = a;
+        } 
+        else if (button.equals("TWO"))
+        {
+            wiimoteData.etatBouton2 = a;
         }
         else if (button.equals("UP"))
         {

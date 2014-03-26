@@ -11,7 +11,7 @@ package dronecontrollerlib.pkg;
  * @author Mathieu
  */
 public class WiimoteData {
-    public char etatBoutonA, etatBoutonB, etatBouton1, etatBouton2, etatBoutonNeg, etatBoutonPos;
-    public char etatBoutonGauche, etatBoutonDroit, etatBoutonBas, etatBoutonHaut, etatBoutonHome;
+    public boolean etatBoutonA, etatBoutonB, etatBouton1, etatBouton2, etatBoutonNeg, etatBoutonPos;
+    public boolean etatBoutonGauche, etatBoutonDroit, etatBoutonBas, etatBoutonHaut, etatBoutonHome;
     public float angleRoll, anglePitch;
 }
