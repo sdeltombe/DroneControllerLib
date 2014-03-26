@@ -25,7 +25,7 @@ public class SocketController extends Controller implements Runnable  {
     private ServerSocket socket;
     static final int DELAY_IN_MS = 100;
     private boolean listen = true;
-    float ancienneValeurY, ancienneValeurX;
+    //float ancienneValeurY, ancienneValeurX;
     WiimoteData wiimoteData = new WiimoteData();
     WiimoteCommander exeProg = new WiimoteCommander(this);
     Socket client;
@@ -145,18 +145,15 @@ public class SocketController extends Controller implements Runnable  {
         {
             setCommand (button, false);
         }
-        else if ((command.startsWith("y") && Float.parseFloat(command.substring(1, command.length())) != ancienneValeurY)
-                    || command.startsWith("x") && Float.parseFloat(command.substring(1, command.length())) != ancienneValeurX);
+        else if (command.startsWith("y") || command.startsWith("x"));
         {
             if (command.startsWith("y"))
             {
                 wiimoteData.angleRoll = Float.parseFloat(button);
-                ancienneValeurY = Float.parseFloat(command.substring(1, command.length()));
             }
             else if (command.startsWith("x"))
             {
                 wiimoteData.anglePitch = Float.parseFloat(button);
-                ancienneValeurX = Float.parseFloat(command.substring(1, command.length()));
             }
         }
         

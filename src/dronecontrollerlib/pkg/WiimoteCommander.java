@@ -16,7 +16,6 @@ public class WiimoteCommander {
     Controller controller;
     boolean etatModeAccelero = false;
     boolean etatAncienBoutonHomeAccelero = false;
-    float ancienneValeurX;
     
     public WiimoteCommander (Controller controller)
     {
@@ -80,11 +79,9 @@ public class WiimoteCommander {
         {
             configureCommand ("==GAUCHE==",(float) 0,(float) -0.5, (float) 0, (float) 0);
         }
-        else if ((wiimoteData.anglePitch >= (float)0.2 || wiimoteData.anglePitch <= (float)-0.1) 
-                && wiimoteData.anglePitch != ancienneValeurX)
+        else if (wiimoteData.anglePitch >= (float)0.2 || wiimoteData.anglePitch <= (float)-0.1)
         {
             configureCommand ("==DEPLACEMENT AV/AR==",(float) 0,(float) 0, wiimoteData.anglePitch, (float) 0);
-           // ancienneValeurX = 
         }
         else if (wiimoteData.angleRoll >= (float)0.2 || wiimoteData.angleRoll <= (float)-0.1)
         {
@@ -101,7 +98,10 @@ public class WiimoteCommander {
         else 
         {
             controller.utility.trace ("==HOVERING==");
-            controller.cmd.action = HOVERING;
+            if (controller.cmd.action != HOVERING)
+            {
+                controller.cmd.action = HOVERING;
+            }
         }
     }
     
