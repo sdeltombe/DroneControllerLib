@@ -11,13 +11,13 @@ import static dronecontrollerlib.pkg.DroneAction.*;
  *
  * @author Mathieu
  */
-public class ExecutionCommandeController {
+public class WiimoteCommander {
 
     Controller controller;
     boolean etatModeAccelero = false;
     char etatAncienBoutonHomeAccelero = 0;
     
-    public ExecutionCommandeController (Controller controller)
+    public WiimoteCommander (Controller controller)
     {
         this.controller = controller;
     }

@@ -26,7 +26,7 @@ public class SocketController extends Controller implements Runnable  {
     static final int DELAY_IN_MS = 100;
     private boolean listen = true;
     WiimoteData wiimoteData = new WiimoteData();
-    ExecutionCommandeController exeProg = new ExecutionCommandeController(this);
+    WiimoteCommander exeProg = new WiimoteCommander(this);
     Socket client;
     public SocketController(Utility utility, Object[] args) {
         super(utility,args);
